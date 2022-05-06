@@ -1,0 +1,2 @@
+# RPGCombatKata
+ Resolucion RPG Combat
