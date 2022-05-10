@@ -40,5 +40,45 @@ namespace Tests
 
             Assert.IsTrue(result); 
         }
+        
+        [Test]
+        public void BeAbleToDealDamage()
+        {
+            Character _target = new Character();
+            _character.DealDamage(_target, 50);
+
+            Assert.AreEqual(950, _target.hp); 
+        }
+        
+        [Test]
+        public void DieWhenNoHpLeft()
+        {
+            Character _target = new Character();
+            _character.DealDamage(_target, 1000);
+
+            Assert.IsFalse(_target.isAlive); 
+        }
+        
+        [Test]
+        public void NotBeAbleToHealOtherDeadCharacter()
+        {
+            Character _target = new Character();
+            _character.DealDamage(_target, 1000);
+            
+            _character.Heal(_target, 50);
+
+            Assert.AreEqual(0, _target.hp);
+        }
+        
+        [Test]
+        public void NotBeAbleToHealOtherAliveCharacterAboveMaxHP()
+        {
+            Character _target = new Character();
+            _character.DealDamage(_target, 100);
+            
+            _character.Heal(_target, 300);
+
+            Assert.AreEqual(1000, _target.hp);
+        }
     }
 }
