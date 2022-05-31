@@ -71,14 +71,53 @@ namespace Tests
         }
         
         [Test]
-        public void NotBeAbleToHealOtherAliveCharacterAboveMaxHP()
+        public void NotBeAbleToHealCharacterAboveMaxHP()
         {
-            Character _target = new Character();
-            _character.DealDamage(_target, 100);
+            Character target = new Character();
+            target.DealDamage(_character, 100);
             
-            _character.Heal(_target, 300);
+            _character.Heal(_character, 300);
 
-            Assert.AreEqual(1000, _target.hp);
+            Assert.AreEqual(1000, target.hp);
         }
+
+        [Test]
+        public void NotBeAbleToDamageItself()
+        {
+            _character.DealDamage(_character, 1000);
+            
+            Assert.AreEqual(1000, _character.hp);
+        }
+
+        [Test]
+        public void NotBeAbleToHealOthers()
+        {
+            Character target = new Character();
+            _character.DealDamage(target, 500);
+            _character.Heal(target, 500);
+            
+            Assert.AreEqual(500, target.hp);
+        }
+
+        [Test]
+        public void DealLessDamageToStrongerTarget()
+        {
+            Character target = new Character();
+            target.level = 6;
+            _character.DealDamage(target, 500);
+            
+            Assert.AreEqual(750, target.hp);
+        }
+
+        [Test]
+        public void DealMoreDamageToWeakerTarget()
+        {
+            Character target = new Character();
+            _character.level = 6;
+            _character.DealDamage(target, 500);
+            
+            Assert.AreEqual(250, target.hp);
+        }
+        
     }
 }
