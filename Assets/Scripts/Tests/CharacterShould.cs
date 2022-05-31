@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Domain;
+using NSubstitute;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -10,11 +11,16 @@ namespace Tests
     public class CharacterShould
     {
         private Character _character;
-
+        private IClass _warrior;
+        private IClass _archer;
         [SetUp]
         public void Setup()
         {
             _character = new Character();
+            _warrior = Substitute.For<IClass>();
+            _archer = Substitute.For<IClass>();
+            _warrior.GetRange().Returns(2);
+            _archer.GetRange().Returns(20);
         }
 
         [Test]
@@ -118,6 +124,43 @@ namespace Tests
             
             Assert.AreEqual(250, target.hp);
         }
+
         
+        [Test]
+        public void HaveRangeBasedOnItsClass()
+        {
+            _character.SetClass(_warrior);
+            Character secondCharacter = new Character();
+            secondCharacter.SetClass(_archer);
+            
+            Assert.AreEqual(_warrior.GetRange(), _character.GetRange());
+            Assert.AreEqual(_archer.GetRange(), secondCharacter.GetRange());
+        }
+
+        [Test]
+        public void NotBeAbleToDealDamageIfNotInRange()
+        {
+            _character.SetClass(_warrior);
+            Character target = new Character();
+            target.SetPosition(4);
+
+            
+            _character.DealDamage(target, 500);
+            
+            Assert.AreEqual(1000, target.hp);
+        }
+
+        [Test]
+        public void BeAbleToDealDamageIfInRange()
+        {
+            _character.SetClass(_archer);
+            Character target = new Character();
+            target.SetPosition(16);
+
+            _character.DealDamage(target, 500);
+            
+            Assert.AreEqual(500, target.hp);
+        }
+
     }
 }

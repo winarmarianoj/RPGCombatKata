@@ -7,6 +7,8 @@ namespace Domain
         public int hp;
         public int level;
         public bool isAlive;
+        private IClass _class = new NoClass();
+        private int _position;
         private const int STARTING_LEVEL = 1;
         private const int STARTING_HP = 1000;
         public Character()
@@ -14,6 +16,11 @@ namespace Domain
             hp = STARTING_HP;
             level = STARTING_LEVEL;
             isAlive = true;
+        }
+
+        public void SetClass(IClass characterClass)
+        {
+            _class = characterClass;
         }
 
         public void DealDamage(Character target, int amount)
@@ -24,6 +31,8 @@ namespace Domain
 
         public void ReceiveDamage(Character fromCharacter, int amountDamage)
         {
+            if (! (Mathf.Abs(_position - fromCharacter._position) <= fromCharacter.GetRange() )) { return; }
+            
             if (IsTargetStronger(fromCharacter))
             {
                 amountDamage = Mathf.CeilToInt(amountDamage * 0.5f);
@@ -64,6 +73,45 @@ namespace Domain
         public void ReceiveHeal(int amountHeal)
         {
             hp = Mathf.Min(1000, hp + amountHeal);
+        }
+
+        public int GetRange()
+        {
+            return _class.GetRange();
+        }
+
+        public void SetPosition(int posX)
+        {
+            _position = posX;
+        }
+    }
+
+    public interface IClass
+    {
+        int GetRange();
+    }
+
+    public class Warrior : IClass
+    {
+        public int GetRange()
+        {
+            return 2;
+        }
+    }
+    
+    public class Archer : IClass
+    {
+        public int GetRange()
+        {
+            return 20;
+        }
+    }
+
+    public class NoClass : IClass
+    {
+        public int GetRange()
+        {
+            return 1;
         }
     }
 }
