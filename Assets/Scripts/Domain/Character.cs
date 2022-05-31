@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Domain
 {
@@ -8,6 +11,7 @@ namespace Domain
         public int level;
         public bool isAlive;
         private IClass _class = new NoClass();
+        private List<IFaction> _factions = new List<IFaction>();
         private int _position;
         private const int STARTING_LEVEL = 1;
         private const int STARTING_HP = 1000;
@@ -26,6 +30,8 @@ namespace Domain
         public void DealDamage(Character target, int amount)
         {
             if (target == this) return;
+            if (target.IsAlly(this)) return; 
+            
             target.ReceiveDamage(this, amount);
         }
 
@@ -62,8 +68,7 @@ namespace Domain
 
         public void Heal(Character target, int amountHeal)
         {
-            if(target!=this) return;
-            
+            if(target!=this && !target.IsAlly(this)) return;
             if (target.isAlive)
             {
                 target.ReceiveHeal(amountHeal);
@@ -84,34 +89,30 @@ namespace Domain
         {
             _position = posX;
         }
-    }
 
-    public interface IClass
-    {
-        int GetRange();
-    }
-
-    public class Warrior : IClass
-    {
-        public int GetRange()
+        public  List<IFaction> GetFactionsList()
         {
-            return 2;
+            return _factions;
         }
-    }
-    
-    public class Archer : IClass
-    {
-        public int GetRange()
-        {
-            return 20;
-        }
-    }
 
-    public class NoClass : IClass
-    {
-        public int GetRange()
+        public void JoinFaction(IFaction faction)
         {
-            return 1;
+            _factions.Add(faction);
+        }
+
+        public bool BelongToFaction(IFaction faction)
+        {
+            return  _factions.Contains(faction);
+        }
+
+        public bool IsAlly(Character target)
+        {
+            return _factions.Any(target.IsInFaction);
+        }
+
+        private bool IsInFaction(IFaction faction)
+        {
+            return _factions.Any(it => it.GetType() == faction.GetType());
         }
     }
 }

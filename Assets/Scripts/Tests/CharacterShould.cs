@@ -13,12 +13,16 @@ namespace Tests
         private Character _character;
         private IClass _warrior;
         private IClass _archer;
+        private IFaction _faction;
+        private IFaction _secondFaction;
         [SetUp]
         public void Setup()
         {
             _character = new Character();
             _warrior = Substitute.For<IClass>();
             _archer = Substitute.For<IClass>();
+            _faction= Substitute.For<IFaction>();
+            _secondFaction = Substitute.For<IFaction>();
             _warrior.GetRange().Returns(2);
             _archer.GetRange().Returns(20);
         }
@@ -160,6 +164,57 @@ namespace Tests
             _character.DealDamage(target, 500);
             
             Assert.AreEqual(500, target.hp);
+        }
+
+        [Test]
+        public void StartWithNoFaction()
+        {
+            Assert.IsEmpty(_character.GetFactionsList());
+        }
+
+        [Test]
+        public void BeAbleToBelongToOneOrMoreFaction()
+        {
+            _character.JoinFaction(_faction);
+            _character.JoinFaction(_secondFaction);
+            
+            Assert.IsTrue(_character.BelongToFaction(_faction));
+            Assert.IsTrue(_character.BelongToFaction(_secondFaction));
+        }
+
+        [Test]
+        public void VerifyAllies()
+        {
+            _character.JoinFaction(_faction);
+            Character target = new Character();
+            target.JoinFaction(_secondFaction);
+            
+            Assert.IsTrue(_character.IsAlly(target));
+        }
+
+        [Test]
+        public void NotBeAbleToDealDamageToAllies()
+        {
+            _character.JoinFaction(_faction);
+            Character target = new Character();
+            target.JoinFaction(_faction);
+            
+            _character.DealDamage(target, 500);
+            
+            Assert.AreEqual(1000, target.hp);
+        }
+
+        [Test]
+        public void BeAbleToHealAllies()
+        {
+            _character.JoinFaction(_faction);
+            Character target = new Character();
+            target.hp = 500;
+            target.JoinFaction(_faction);
+            
+            _character.Heal(target, 500);
+            
+            Assert.AreEqual(1000, target.hp);
         }
 
     }
