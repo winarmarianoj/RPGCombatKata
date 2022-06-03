@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Domain
 {
-    public class Character
+    public class Character: ICharacter
     {
         public int hp;
         public int level;
@@ -33,6 +33,11 @@ namespace Domain
             if (target.IsAlly(this)) return; 
             
             target.ReceiveDamage(this, amount);
+        }
+
+        public void DealDamage(IProp prop, int amount)
+        {
+            prop.ReceiveDamage(amount);
         }
 
         public void ReceiveDamage(Character fromCharacter, int amountDamage)
@@ -114,5 +119,7 @@ namespace Domain
         {
             return _factions.Any(it => it.GetType() == faction.GetType());
         }
+
+       
     }
 }

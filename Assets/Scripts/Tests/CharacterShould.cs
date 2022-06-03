@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using Domain;
 using NSubstitute;
 using NUnit.Framework;
@@ -215,6 +214,15 @@ namespace Tests
             _character.Heal(target, 500);
             
             Assert.AreEqual(1000, target.hp);
+        }
+
+        [Test]
+        public void BeAbleToDealDamageProps()
+        {
+            IProp prop = new Prop();
+            
+            _character.DealDamage(prop, 500);
+            Assert.AreEqual(500, prop.GetHp());
         }
 
     }
